@@ -1,16 +1,9 @@
 # eventcountdown
 
-A new Flutter project.
+An event countdown application created in Flutter, using only Future.delayed and NOT the Timer class at all.
+- Used DateTime to calculate time difference in seconds
 
-## Getting Started
+## Future improvements
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Make the UI better on the first page
+- Handle past time errors (Although I may have done that unintentionally)
