@@ -9,6 +9,9 @@ class EventProvider extends ChangeNotifier {
   int _hour=0;
   int _minute=0;
   bool _timerFinished = false;
+  bool _showError = false;
+  String _eventName = "";
+  bool _showTextError = false;
 
   int get year => _year;
   int get month => _month;
@@ -16,19 +19,41 @@ class EventProvider extends ChangeNotifier {
   int get hour => _hour;
   int get minute => _minute;
   bool get timerFinished => _timerFinished;
+  bool get showError => _showError;
+  String get eventName => _eventName;
+  bool get showTextError => _showTextError;
 
-  void initValues(
+  set showTextError(err){
+    _showTextError = err;
+    notifyListeners();
+    Future.delayed(Duration(seconds: 5)).then((_){
+      _showTextError = false;
+      notifyListeners();
+    });
+  }
+  
+  
+  
+  
+
+  Future<bool> initValues(
       {@required int year,
       @required int month,
       @required int day,
       @required int minute,
-      @required int hour}) {
+      @required int hour, @required String eventName}) async{
     _year = year;
     _month = month;
     _day = day;
     _hour = hour;
     _minute = minute;
-    validateInput();
+    _eventName = eventName;
+    await validateInput();
+  }
+
+  String getRandomString()
+  {
+    return "Hey! Thats not how a countdown works!";
   }
 
   validateInput() {
@@ -44,7 +69,7 @@ class EventProvider extends ChangeNotifier {
     convertInput(days, months, years, hours, minutes);
   }
 
-  void convertInput(days, months, years, hours, minutes) {
+  void convertInput(days, months, years, hours, minutes) async{
     DateTime localTime = DateTime(years, months, days, hours, minutes);
     DateTime userTime = DateTime(_year, _month, _day, _hour, _minute);
 
@@ -75,6 +100,17 @@ class EventProvider extends ChangeNotifier {
     print("Actualy H:"+_hour.toString());
     print("Actualy M:"+_minute.toString());
     print("Actualy S:"+_second.toString());
+    if(actualSeconds<0 || (actualSeconds==0 && actualMinutes == 0 && actualHours == 0 && actualDays == 0))
+    {
+      _showError = true;
+      notifyListeners();
+      await Future.delayed(Duration(seconds:5)).then((_){
+        _showError = false;
+        notifyListeners();
+      });
+
+
+    }
 
   }
 

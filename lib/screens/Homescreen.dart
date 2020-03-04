@@ -1,14 +1,35 @@
 import 'package:eventcountdown/provider/countdown.dart';
 import 'package:eventcountdown/screens/count_down.dart';
+import 'package:eventcountdown/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   int _year;
   int _month;
   int _day;
   int _hour;
   int _minute;
+
+  TextEditingController _textEditingController;
+  AnimationController _controller;
+  Animation<double> _animation;
+
+  @override
+  void initState() {
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _textEditingController = TextEditingController();
+    super.initState();
+  }
 
   Future<BuildContext> selectDate(context) async {
     DateTime _date = DateTime.now();
@@ -42,84 +63,142 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EventProvider  provider = Provider.of<EventProvider>(context,listen: false);
-    var _themeColors = [Colors.cyan, Colors.cyanAccent];
+    EventProvider provider = Provider.of<EventProvider>(context, listen: false);
     var _screenHeight = MediaQuery.of(context).size.height;
     var _screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-        body: Center(
-            child: Container(
-                margin: EdgeInsets.only(left: 10, right: 10),
-                height: _screenHeight / 2,
-                width: _screenWidth,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 100,
-                        spreadRadius: 0,
-                        color: _themeColors[1])
-                  ],
-                ),
-                padding: EdgeInsets.all(20),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      TextField(
-                          decoration: InputDecoration(
-                              labelText: "Enter event name",
-                              labelStyle: TextStyle(
-                                  fontSize: 20, color: _themeColors[0]))),
-                      Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        body: Stack(children: <Widget>[
+      Container(
+          height: _screenHeight,
+          width: _screenWidth,
+          child: Image.asset(
+            "assets/bgimage.jpg",
+            fit: BoxFit.cover,
+          )),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white),
+            ),
+            margin: EdgeInsets.only(left: 10, right: 10),
+            height: _screenHeight / 2,
+            width: _screenWidth,
+            padding: EdgeInsets.only(left: 20, right: 20),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  TextField(
+                      style: TextStyle(color: Colors.white),
+                      controller: _textEditingController,
+                      decoration: InputDecoration(
+                         
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.white,
+                            ),
+                          ),
+                          helperText: "Example: John's birthday!",
+                          labelText: "Enter event name (Optional)",
+                          focusColor: Colors.white,
+                          helperStyle: TextStyle(color: Colors.white),
+                          labelStyle:
+                              TextStyle(fontSize: 20, color: Colors.white))),
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                            padding: EdgeInsets.only(top: 10, bottom: 10),
+                            child: Text("Mark your event!",
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white))),
+                        SizedBox(height: _screenHeight / 40),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Container(
-                                padding: EdgeInsets.all(10.0),
-                                child: Text("Mark your event!",
-                                    style: TextStyle(
-                                        fontSize: 20, color: _themeColors[0]))),
-                            SizedBox(height: _screenHeight / 40),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Material(
-                                  child: Ink(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                        color: _themeColors[1],
-                                      ),
-                                      height: _screenHeight / 12,
-                                      width: _screenWidth / 4,
-                                      child: InkWell(
-                                        onTap: () async {
-                                          await selectDate(context).then(
-                                              (context) => selectTime(context));
-                                           
-                                           Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>CountDownScreen()));
-                                           provider.initValues(year: this._year, month: this._month, day: this._day, minute: this._minute, hour: this._hour);       
-                                          
-                                        },
-                                        splashColor: _themeColors[0],
-                                        child: Center(
-                                            child: Icon(
-                                          Icons.add_alarm,
-                                          color: _themeColors[0],
-                                          size: _screenWidth / 6,
-                                        )),
-                                      )),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.white),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(18.0)),
+                                  //color: themeColors[0],
                                 ),
-                              ],
-                            ),
+                                height: _screenHeight / 12,
+                                width: _screenWidth / 4,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    try {
+                                      await selectDate(context).then(
+                                          (context) => selectTime(context));
+
+                                      await provider.initValues(
+                                          year: this._year,
+                                          month: this._month,
+                                          day: this._day,
+                                          minute: this._minute,
+                                          hour: this._hour,
+                                          eventName: _textEditingController.text
+                                              .trim());
+                                      if (!provider.showError) {
+                                        Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CountDownScreen()),
+                                                    );
+                                      }
+                                    } catch (e) {
+                                      print(e.toString());
+                                    }
+                                  },
+                                  //splashColor: themeColors[1],
+                                  child: Center(
+                                      child: Icon(
+                                    Icons.add_alarm,
+                                    color: Colors.white,
+                                    size: _screenWidth / 10,
+                                  )),
+                                )),
                           ],
                         ),
-                      ),
-                    ]))));
+                      ],
+                    ),
+                  ),
+                ]),
+          ),
+          Consumer<EventProvider>(builder: (context, data, child) {
+            if (data.showError) {
+              _controller.forward();
+            } else {
+              _controller.reverse();
+            }
+            return FadeTransition(
+              opacity: _animation,
+              child: Container(
+
+                padding: EdgeInsets.all(10),
+                child: Center(
+                    child: Text(
+                  'Hey! Thats not how a countdown works!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                )),
+              ),
+            );
+          }),
+        ],
+      ),
+    ]));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _textEditingController.dispose();
+    super.dispose();
   }
 }
