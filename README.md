@@ -6,6 +6,4 @@ An event countdown application created in Flutter, using only Future.delayed and
 
 ## Future improvements
 
-- Make the UI better on the first page
-- Implement Event name in provider
-- Handle past time errors (Although I may have done that unintentionally)
+- Release on playstore
